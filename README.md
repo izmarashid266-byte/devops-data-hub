@@ -1,70 +1,198 @@
-# Getting Started with Create React App
+# DevOps Data Hub
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A full-stack DevOps project built using React, Flask, PostgreSQL, and AWS.
 
-## Available Scripts
+## Project Overview
 
-In the project directory, you can run:
+DevOps Data Hub is a cloud-based full-stack application deployed on AWS.
 
-### `npm start`
+The project demonstrates how a React frontend communicates with a Flask backend API, which stores application data in PostgreSQL.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+The infrastructure is designed using an AWS VPC with public and private subnets to separate the frontend from backend and database resources.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Architecture
+                         Internet
+                            |
+                            v
+                   +------------------+
+                   | Internet Gateway |
+                   +------------------+
+                            |
+                            v
+                 +----------------------+
+                 |    Public Subnet     |
+                 |                      |
+                 |  Frontend EC2        |
+                 |  React + Nginx       |
+                 +----------------------+
+                            |
+                            | API Requests
+                            v
+                 +----------------------+
+                 |    Private Subnet    |
+                 |                      |
+                 |  Backend EC2         |
+                 |  Flask API :5000     |
+                 |         |            |
+                 |         v            |
+                 |  Database EC2        |
+                 |  PostgreSQL :5432    |
+                 +----------------------+
 
-### `npm test`
+                 AWS VPC: 10.0.0.0/16
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
+## Technologies Used
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Frontend
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+* React.js
+* JavaScript
+* HTML
+* CSS
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Backend
 
-### `npm run eject`
+* Python
+* Flask
+* REST API
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Database
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+* PostgreSQL
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### Cloud & DevOps
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+* Amazon EC2
+* Amazon VPC
+* Public and Private Subnets
+* Internet Gateway
+* NAT Gateway
+* Route Tables
+* Security Groups
+* Nginx
+* Git
+* GitHub
 
-## Learn More
+## AWS Infrastructure
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+The application is deployed inside an AWS VPC.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### VPC
 
-### Code Splitting
+* CIDR: `10.0.0.0/16`
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Public Subnet
 
-### Analyzing the Bundle Size
+* CIDR: `10.0.1.0/24`
+* Contains the frontend EC2 instance
+* Connected to the Internet through an Internet Gateway
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Private Subnet
 
-### Making a Progressive Web App
+* CIDR: `10.0.2.0/24`
+* Contains the backend and database EC2 instances
+* Backend and database resources are not directly exposed to the public internet
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Application Flow
 
-### Advanced Configuration
+1. A user accesses the React frontend through the public EC2 instance.
+2. Nginx receives incoming HTTP requests.
+3. Frontend API requests are forwarded to the Flask backend.
+4. Flask processes the request.
+5. The backend communicates with PostgreSQL.
+6. PostgreSQL stores or retrieves the requested data.
+7. The response is returned through the backend to the frontend.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Security
 
-### Deployment
+Security Groups are used to control communication between the different layers.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+* Frontend allows HTTP traffic.
+* Backend API access is restricted to the frontend security group.
+* PostgreSQL access is restricted to the backend security group.
+* Backend and database servers are placed in the private subnet.
 
-### `npm run build` fails to minify
+## Project Structure
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+devops-data-hub/
+│
+├── public/
+├── src/
+├── .gitignore
+├── package.json
+├── package-lock.json
+└── README.md
+
+## Frontend
+
+The frontend is developed using React.
+
+It provides the user interface for viewing and submitting data.
+
+The frontend communicates with the Flask backend through API requests.
+
+## Backend
+
+The backend is developed using Flask and exposes API endpoints for handling application data.
+
+The Flask application communicates with PostgreSQL for database operations.
+
+## Database
+
+PostgreSQL is used as the application's relational database.
+
+The database server runs separately from the frontend and backend and is placed inside the private subnet.
+
+## Nginx
+
+Nginx is used as a reverse proxy on the frontend EC2 instance.
+
+It forwards:
+
+* Frontend requests to the React application
+* `/api/` requests to the Flask backend
+
+## Git & GitHub
+
+Git is used for version control and GitHub is used to store the project source code.
+
+The project follows a basic Git workflow:
+
+
+Local Development
+       |
+       v
+      Git
+       |
+       v
+    GitHub
+
+## Security Considerations
+
+Sensitive information is intentionally excluded from this repository.
+
+The following should never be committed to GitHub:
+
+* Private SSH keys
+* Passwords
+* API tokens
+* Database credentials
+* `.env` files containing secrets
+* AWS access keys
+
+## Future Improvements
+
+* Deploy the React production build using Nginx
+* Add HTTPS using SSL/TLS
+* Add CI/CD using GitHub Actions
+* Add application monitoring
+* Improve database security
+* Add automated testing
+* Add centralized logging
+
+## Author
+
+**Izma Khan**
+
+Built as a hands-on AWS, DevOps, and full-stack learning project.
